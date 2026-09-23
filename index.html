@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Matematika Cambridge - Kelas 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16233F; --navy2:#22335C; --gold:#F5A623; --gold2:#D88A0A;
+  --cream:#FAF7F1; --green:#2E9E6B; --red:#E1504B; --ink:#1E2430;
+  --muted:#6B7280; --white:#fff; --radius:14px;
+  --shadow:0 6px 20px rgba(22,35,63,.12);
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter',Arial,sans-serif;background:var(--cream);color:var(--ink);}
+h1,h2,h3,.brand{font-family:'Fredoka',Arial,sans-serif;}
+.screen{display:none;min-height:100vh;padding:28px 16px 60px;}
+.screen.active{display:flex;flex-direction:column;align-items:center;}
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;max-width:560px;width:100%;}
+.brand{color:var(--navy);font-size:1.5rem;font-weight:700;margin:0 0 4px;text-align:center;}
+.sub{color:var(--muted);text-align:center;margin:0 0 24px;font-size:.95rem;}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:.9rem;color:var(--navy);}
+input[type=text]{width:100%;padding:12px 14px;border:2px solid #E4E0D6;border-radius:10px;font-size:1rem;font-family:inherit;}
+input[type=text]:focus{outline:none;border-color:var(--gold);}
+.btn{display:inline-block;border:none;border-radius:10px;padding:13px 22px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .15s;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--gold);color:var(--navy);width:100%;margin-top:20px;}
+.btn-primary:disabled{background:#D8D3C6;color:#8B8677;cursor:not-allowed;}
+.btn-outline{background:transparent;border:2px solid var(--navy);color:var(--navy);}
+.btn-secondary{background:var(--navy);color:var(--white);}
+.errText{color:var(--red);font-size:.85rem;min-height:18px;margin-top:6px;}
+.instrList{padding-left:20px;color:var(--ink);line-height:1.7;}
+.instrList li{margin-bottom:8px;}
+/* quiz screen */
+.quizWrap{max-width:640px;width:100%;}
+.quizHeader{background:var(--navy);color:#fff;border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;}
+.quizHeader .who{font-size:.85rem;opacity:.8;}
+.quizHeader .prog{font-weight:600;margin-top:4px;}
+.navGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:var(--white);padding:12px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;}
+.navbtn{aspect-ratio:1;border:2px solid #E4E0D6;background:#fff;border-radius:8px;font-weight:600;cursor:pointer;font-size:.82rem;color:var(--muted);}
+.navbtn.answered{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.navbtn.current{border-color:var(--navy);border-width:3px;color:var(--navy);}
+.qCard{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;}
+.qNumber{color:var(--gold2);font-weight:700;font-size:.85rem;margin-bottom:8px;}
+.qText{font-size:1.08rem;font-weight:600;line-height:1.5;margin:0 0 18px;}
+.option{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border:2px solid #E4E0D6;border-radius:10px;background:#fff;margin-bottom:10px;cursor:pointer;font-family:inherit;font-size:.97rem;}
+.option.selected{border-color:var(--gold);background:#FFF6E6;}
+.optLetter{flex:0 0 26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.option.selected .optLetter{background:var(--gold2);}
+.navRow{display:flex;gap:10px;margin-top:16px;}
+.navRow .btn{flex:1;}
+.submitRow{margin-top:14px;}
+/* result */
+.scoreCircle{width:150px;height:150px;border-radius:50%;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;}
+.scoreCircle .big{font-size:2rem;font-weight:700;font-family:'Fredoka',sans-serif;}
+.scoreCircle .lbl{font-size:.75rem;opacity:.8;}
+.resultStats{display:flex;justify-content:center;gap:26px;margin:10px 0 22px;text-align:center;}
+.resultStats .val{font-size:1.5rem;font-weight:700;color:var(--navy);font-family:'Fredoka',sans-serif;}
+.resultStats .lbl{font-size:.8rem;color:var(--muted);}
+/* review */
+.reviewWrap{max-width:640px;width:100%;}
+.reviewItem{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:12px;}
+.reviewHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.reviewNum{background:var(--navy);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;}
+.badge{padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
+.badge.ok{background:#DCF3E8;color:var(--green);}
+.badge.no{background:#FBE3E1;color:var(--red);}
+.reviewQ{font-weight:600;margin:6px 0;}
+.reviewLine{margin:4px 0;font-size:.92rem;}
+.reviewExp{margin-top:8px;font-size:.9rem;color:var(--muted);background:#FAF7F1;padding:10px 12px;border-radius:8px;}
+/* highscore */
+.hsTable{width:100%;border-collapse:collapse;margin-top:10px;}
+.hsTable th,.hsTable td{padding:10px 8px;text-align:left;border-bottom:1px solid #EEE9DD;font-size:.92rem;}
+.hsTable th{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+.loading{text-align:center;color:var(--muted);padding:20px 0;}
+.backLink{background:none;border:none;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:14px;font-family:inherit;font-size:.9rem;padding:0;}
+@media(max-width:480px){.navGrid{grid-template-columns:repeat(5,1fr);}.scoreCircle{width:130px;height:130px;}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="screen active" id="screen-start">
+    <div class="card">
+      <h1 class="brand">📘 Kuis Matematika Cambridge</h1>
+      <p class="sub">Kelas 4 · Number &amp; Negative Numbers</p>
+      <label for="inputNama">Nama Lengkap</label>
+      <input type="text" id="inputNama" placeholder="Tulis nama kamu">
+      <label for="inputKelas">Kelas</label>
+      <input type="text" id="inputKelas" placeholder="Contoh: 4A">
+      <div class="errText" id="startError"></div>
+      <button class="btn btn-primary" onclick="toInstructions()">Mulai</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-instructions">
+    <div class="card">
+      <h2 class="brand" style="font-size:1.25rem">Petunjuk Pengerjaan</h2>
+      <ol class="instrList">
+        <li>Berdoalah terlebih dahulu sebelum mengerjakan soal.</li>
+        <li>Kuis terdiri dari 35 soal pilihan ganda dengan satu jawaban benar.</li>
+        <li>Klik nomor soal untuk berpindah, atau gunakan tombol Sebelumnya/Selanjutnya.</li>
+        <li>Bacalah setiap soal dengan teliti sebelum memilih jawaban.</li>
+        <li>Tombol <strong>Kumpulkan Jawaban</strong> hanya aktif setelah semua 35 soal terjawab.</li>
+        <li>Periksa kembali jawabanmu sebelum menekan tombol Kumpulkan Jawaban.</li>
+        <li>Setelah dikumpulkan, jawaban tidak dapat diubah lagi.</li>
+        <li>Bacalah hamdalah setelah selesai mengerjakan.</li>
+      </ol>
+      <button class="btn btn-primary" onclick="toQuiz()">Lanjutkan ke Soal</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz">
+    <div class="quizWrap">
+      <div class="quizHeader">
+        <div class="who" id="quizWho"></div>
+        <div class="prog" id="progressText"></div>
+      </div>
+      <div class="navGrid" id="navGrid"></div>
+      <div class="qCard">
+        <div class="qNumber" id="qNumber"></div>
+        <p class="qText" id="qText"></p>
+        <div id="optionsWrap"></div>
+        <div class="navRow">
+          <button class="btn btn-outline" id="prevBtn" onclick="prevQ()">← Sebelumnya</button>
+          <button class="btn btn-outline" id="nextBtn" onclick="nextQ()">Selanjutnya →</button>
+        </div>
+        <div class="submitRow">
+          <button class="btn btn-primary" id="submitBtn" onclick="submitQuiz()" disabled>Kumpulkan Jawaban</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-result">
+    <div class="card" style="text-align:center">
+      <h2 class="brand" style="font-size:1.2rem" id="resName"></h2>
+      <div class="scoreCircle">
+        <div class="big" id="resNilai"></div>
+        <div class="lbl">NILAI</div>
+      </div>
+      <div class="resultStats">
+        <div><div class="val" id="resScore"></div><div class="lbl">Skor Benar</div></div>
+        <div><div class="val" id="resGrade"></div><div class="lbl">Predikat</div></div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="showReview()">Lihat Pembahasan</button>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:10px" onclick="showHighscore()">Lihat Highscore</button>
+      <button class="btn btn-outline" style="width:100%" onclick="location.reload()">Kerjakan Lagi</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-review">
+    <div class="reviewWrap">
+      <button class="backLink" onclick="showScreen('screen-result')">← Kembali ke Hasil</button>
+      <h2 class="brand" style="font-size:1.2rem;margin-bottom:14px">Pembahasan Soal</h2>
+      <div id="reviewWrap"></div>
+      <button class="btn btn-outline" style="width:100%" onclick="showScreen('screen-result')">Kembali ke Hasil</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-highscore">
+    <div class="card">
+      <button class="backLink" onclick="showScreen('screen-result')">← Kembali ke Hasil</button>
+      <h2 class="brand" style="font-size:1.2rem">🏆 Highscore</h2>
+      <p class="sub" style="margin-bottom:0">10 nilai tertinggi</p>
+      <div id="hsWrap"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ====== KONFIGURASI DATABASE (GOOGLE SHEET) ======
+// Isi SCRIPT_URL dengan URL Web App Google Apps Script (lihat panduan dari Claude).
+// Jika dikosongkan, skor & highscore hanya tersimpan di browser (localStorage).
+const CONFIG = { SCRIPT_URL: "https://script.google.com/macros/s/AKfycbypeDFHR6YdufGUd3y-PffmmA6g_Tb5hfhmYq4m17VplMg3goWl5vOfomTF9_4pg16p/exec" };
+
+const QUESTIONS = [
+{q:"In the number 78,412, the value of the digit 7 is ....",o:["7","70","7,000","70,000"],c:3,e:"Angka 7 pada 78,412 menempati nilai tempat puluhan ribu, sehingga nilainya 70,000."},
+{q:"The correct way to write 90,506 in words is ....",o:["nine thousand five hundred and six","ninety thousand, five hundred and six","ninety thousand and fifty-six","nine hundred thousand and six"],c:1,e:"90,506 dalam kata-kata ditulis 'ninety thousand, five hundred and six'."},
+{q:'A newspaper reported: "The concert hall welcomed 47,364 visitors during the festival week." If this number is rounded to the nearest thousand, there are ... visitors.',o:["47,000","48,000","47,300","47,400"],c:0,e:"Angka ratusan pada 47,364 adalah 3 (<5), sehingga dibulatkan ke bawah menjadi 47,000."},
+{q:"Round 63,829 to the nearest 10,000.",o:["60,000","64,000","70,000","63,000"],c:0,e:"Angka ribuan pada 63,829 adalah 3 (<5), sehingga dibulatkan ke bawah menjadi 60,000."},
+{q:"Three towns recorded their populations: Rivertown 58,239, Lakeview 58,293, and Hillcrest 58,192. The town that has the greatest population is ....",o:["Rivertown","Lakeview","Hillcrest","All three are equal"],c:1,e:"58,293 (Lakeview) lebih besar daripada 58,239 (Rivertown) dan 58,192 (Hillcrest)."},
+{q:"Start at 29,994 and count on in steps of 10, four times. The number you reach is ....",o:["30,034","30,004","29,034","30,394"],c:0,e:"29,994 + (10 × 4) = 29,994 + 40 = 30,034."},
+{q:"The list of numbers arranged in descending order (largest to smallest) is shown by ....",o:["81,204; 81,420; 81,042; 80,999","81,420; 81,204; 81,042; 80,999","80,999; 81,042; 81,204; 81,420","81,042; 80,999; 81,204; 81,420"],c:1,e:"Urutan dari terbesar ke terkecil adalah 81,420 > 81,204 > 81,042 > 80,999."},
+{q:"The number that represents fifteen degrees below zero is ....",o:["15","-15","0","150"],c:1,e:"'Fifteen degrees below zero' ditulis sebagai -15."},
+{q:"On a number line, the number that is furthest to the left is ....",o:["-3","-8","2","5"],c:1,e:"Semakin negatif suatu bilangan, semakin ke kiri letaknya pada garis bilangan; -8 adalah yang terkecil."},
+{q:"A weather report showed the temperature at midnight was -6°C. By 6 a.m., the temperature had risen by 9°C. The temperature at 6 a.m. was ....",o:["3°C","-3°C","15°C","-15°C"],c:0,e:"-6 + 9 = 3°C."},
+{q:"The correct statement is ....",o:["-4 > -1","-9 < -2","-7 > 0","-2 < -5"],c:1,e:"-9 terletak lebih ke kiri daripada -2 pada garis bilangan, sehingga -9 < -2 benar."},
+{q:"A factor of 36 is ....",o:["5","7","9","11"],c:2,e:"36 ÷ 9 = 4 tanpa sisa, sehingga 9 adalah faktor dari 36."},
+{q:"A multiple of 8 is ....",o:["42","54","64","70"],c:2,e:"8 × 8 = 64, sehingga 64 adalah kelipatan dari 8."},
+{q:"A shopkeeper has 84 pencils and wants to pack them into boxes so that each box has an equal number with none left over. The box size that will work exactly is ....",o:["5","6","9","11"],c:1,e:"84 ÷ 6 = 14 tepat tanpa sisa, sehingga ukuran kotak isi 6 bisa digunakan."},
+{q:"A number is a multiple of both 4 and 6. This number could be ....",o:["16","20","24","30"],c:2,e:"24 adalah kelipatan dari 4 (4×6) sekaligus kelipatan dari 6 (6×4)."},
+{q:"A company rounds numbers to the nearest 10,000. Which pair of numbers BOTH round to 50,000?",o:["46,200 and 54,999","44,800 and 55,600","46,200 and 44,800","54,999 and 55,600"],c:0,e:"46,200 dan 54,999 berada pada rentang 45,000-55,000, sehingga keduanya dibulatkan menjadi 50,000."},
+{q:"A company rounds its quarterly revenue to the nearest thousand and reports $72,000. Which TWO actual revenue amounts could BOTH have been rounded to $72,000?",o:["$71,620 and $72,430","$71,420 and $72,560","$71,620 and $71,420","$72,430 and $72,560"],c:0,e:"71,620 dan 72,430 berada pada rentang 71,500-72,500, sehingga keduanya dibulatkan menjadi $72,000."},
+{q:"A submarine is at a depth of -120 m. It rises by 45 m. What is its depth now?",o:["-75 m","-165 m","-105 m","-45 m"],c:0,e:"-120 + 45 = -75."},
+{q:"The submarine from the previous situation, now at -75 m, then descends by 30 m. What is its new depth?",o:["-45 m","-75 m","-105 m","-135 m"],c:2,e:"-75 - 30 = -105."},
+{q:"Which pair of statements about negative numbers are BOTH true?",o:["-10 is less than -3, and -1 is greater than -100","0 is less than -5, and -50 is greater than 10","-10 is less than -3, and 0 is less than -5","-1 is greater than -100, and -50 is greater than 10"],c:0,e:"-10 < -3 benar (-10 lebih ke kiri), dan -1 > -100 juga benar (-1 lebih dekat ke nol)."},
+{q:"Which pair of numbers are BOTH common multiples of 3 and 5?",o:["15 and 30","20 and 24","15 and 20","24 and 30"],c:0,e:"15 dan 30 merupakan kelipatan 3 sekaligus kelipatan 5 (kelipatan 15); 20 dan 24 bukan."},
+{q:"Write the number sixty-two thousand, four hundred and seventeen in digits.",o:["62,417","26,417","62,470","60,247"],c:0,e:"'Sixty-two thousand, four hundred and seventeen' ditulis sebagai 62,417."},
+{q:"84,650 rounded to the nearest 1,000 is ....",o:["84,000","85,000","84,700","80,000"],c:1,e:"Angka ratusan pada 84,650 adalah 6 (≥5), sehingga dibulatkan ke atas menjadi 85,000."},
+{q:"The temperature was -8°C. It then increased by 12°C. The new temperature is ....",o:["-4°C","4°C","20°C","-20°C"],c:1,e:"-8 + 12 = 4°C."},
+{q:"A lift is at floor -2 (two floors below ground level). It goes up 5 floors. It is now at floor ....",o:["3","-3","7","-7"],c:0,e:"-2 + 5 = 3, sehingga lift berada di lantai 3."},
+{q:"The first four multiples of 7 are 7, 14, 21, and ....",o:["27","28","35","24"],c:1,e:"7 × 4 = 28, sehingga kelipatan keempat dari 7 adalah 28."},
+{q:"A museum recorded the number of visitors over three days: Monday 28,463, Tuesday 28,691, and Wednesday 27,982. On which day were there the fewest visitors?",o:["Monday","Tuesday","Wednesday","All three days are equal"],c:2,e:"27,982 pengunjung pada hari Rabu adalah yang paling sedikit di antara ketiga hari."},
+{q:"Using the museum visitor data (Monday 28,463, Tuesday 28,691, Wednesday 27,982), if the number of visitors on Tuesday is rounded to the nearest hundred, the result is ....",o:["28,600","28,700","28,690","29,000"],c:1,e:"Angka puluhan pada 28,691 adalah 9 (≥5), sehingga dibulatkan ke atas menjadi 28,700."},
+{q:"Using the museum visitor data (Monday 28,463, Tuesday 28,691, Wednesday 27,982), if the number of visitors on Monday is rounded to the nearest thousand, the result is ....",o:["28,000","29,000","28,500","27,000"],c:0,e:"Angka ratusan pada 28,463 adalah 4 (<5), sehingga dibulatkan ke bawah menjadi 28,000."},
+{q:"The temperature in a city was recorded as: 6:00 a.m. -7°C, 9:00 a.m. -2°C, 12:00 p.m. 5°C, and 3:00 p.m. 3°C. The temperature difference between 6:00 a.m. and 12:00 p.m. is ....",o:["2°C","12°C","-12°C","-2°C"],c:1,e:"5 - (-7) = 12°C."},
+{q:"Using the same temperature data (6:00 a.m. -7°C, 9:00 a.m. -2°C, 12:00 p.m. 5°C, 3:00 p.m. 3°C), the temperature dropped between ....",o:["6:00 a.m. and 9:00 a.m.","9:00 a.m. and 12:00 p.m.","12:00 p.m. and 3:00 p.m.","3:00 p.m. and 6:00 a.m."],c:2,e:"Suhu turun dari 5°C pukul 12:00 menjadi 3°C pukul 15:00."},
+{q:"Using the same temperature data, the order of the temperatures from lowest to highest is ....",o:["-7°C, -2°C, 3°C, 5°C","5°C, 3°C, -2°C, -7°C","-2°C, -7°C, 3°C, 5°C","-7°C, 3°C, -2°C, 5°C"],c:0,e:"Urutan -7, -2, 3, 5 dari terendah ke tertinggi tetap -7, -2, 3, 5."},
+{q:"A school is organizing 90 students into equal groups for a class project. Which set of THREE numbers are all factors of 90?",o:["2, 5, and 9","2, 5, and 7","4, 5, and 9","2, 6, and 8"],c:0,e:"90 ÷ 2 = 45, 90 ÷ 5 = 18, dan 90 ÷ 9 = 10, semuanya habis dibagi, sehingga 2, 5, dan 9 adalah faktor dari 90."},
+{q:"With 90 students, if the teacher wants to form 9 equal groups, each group will have ... students.",o:["9","10","15","18"],c:1,e:"90 ÷ 9 = 10 siswa per kelompok."},
+{q:"With 90 students, if the teacher wants to form groups of 15 students each, the total number of groups is ....",o:["5","6","9","10"],c:1,e:"90 ÷ 15 = 6 kelompok."}
+];
+
+let studentName='', studentClass='';
+let answers = new Array(QUESTIONS.length).fill(null);
+let currentQ = 0;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toInstructions(){
+  const name=document.getElementById('inputNama').value.trim();
+  const kelas=document.getElementById('inputKelas').value.trim();
+  const err=document.getElementById('startError');
+  if(!name || !kelas){ err.textContent='Nama dan kelas wajib diisi.'; return; }
+  studentName=name; studentClass=kelas; err.textContent='';
+  showScreen('screen-instructions');
+}
+
+function toQuiz(){
+  document.getElementById('quizWho').textContent = studentName + ' · Kelas ' + studentClass;
+  buildNav();
+  renderQuestion(0);
+  showScreen('screen-quiz');
+}
+
+function buildNav(){
+  const nav=document.getElementById('navGrid'); nav.innerHTML='';
+  QUESTIONS.forEach((q,i)=>{
+    const b=document.createElement('button');
+    b.className='navbtn'; b.textContent=i+1; b.type='button';
+    b.onclick=()=>renderQuestion(i);
+    nav.appendChild(b);
+  });
+  updateNav();
+}
+
+function updateNav(){
+  document.querySelectorAll('.navbtn').forEach((b,i)=>{
+    b.classList.toggle('answered', answers[i]!==null);
+    b.classList.toggle('current', i===currentQ);
+  });
+  const answeredCount=answers.filter(a=>a!==null).length;
+  document.getElementById('progressText').textContent='Terjawab: '+answeredCount+' / '+QUESTIONS.length;
+  document.getElementById('submitBtn').disabled = answeredCount < QUESTIONS.length;
+}
+
+function renderQuestion(i){
+  currentQ=i;
+  const q=QUESTIONS[i];
+  document.getElementById('qNumber').textContent='Soal '+(i+1)+' dari '+QUESTIONS.length;
+  document.getElementById('qText').textContent=q.q;
+  const opts=document.getElementById('optionsWrap'); opts.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.o.forEach((optText,idx)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='option'+(answers[i]===idx?' selected':'');
+    b.innerHTML='<span class="optLetter">'+letters[idx]+'</span><span>'+optText+'</span>';
+    b.onclick=()=>{ answers[i]=idx; renderQuestion(i); };
+    opts.appendChild(b);
+  });
+  document.getElementById('prevBtn').disabled = i===0;
+  document.getElementById('nextBtn').disabled = i===QUESTIONS.length-1;
+  updateNav();
+}
+
+function prevQ(){ if(currentQ>0) renderQuestion(currentQ-1); }
+function nextQ(){ if(currentQ<QUESTIONS.length-1) renderQuestion(currentQ+1); }
+
+function submitQuiz(){
+  if(answers.filter(a=>a!==null).length < QUESTIONS.length) return;
+  let score=0;
+  QUESTIONS.forEach((q,i)=>{ if(answers[i]===q.c) score++; });
+  const nilai=Math.round(score/QUESTIONS.length*100);
+  let grade='D'; if(nilai>=90) grade='A'; else if(nilai>=75) grade='B'; else if(nilai>=60) grade='C';
+  document.getElementById('resName').textContent = studentName+' · Kelas '+studentClass;
+  document.getElementById('resNilai').textContent = nilai;
+  document.getElementById('resScore').textContent = score+' / '+QUESTIONS.length;
+  document.getElementById('resGrade').textContent = grade;
+  showScreen('screen-result');
+  saveScore({nama:studentName, kelas:studentClass, skor:score, nilai:nilai});
+}
+
+function saveScore(data){
+  if(CONFIG.SCRIPT_URL){
+    fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)})
+      .catch(()=>saveLocal(data));
+  } else {
+    saveLocal(data);
+  }
+}
+function saveLocal(data){
+  const key='quizLeaderboardLocal';
+  const list=JSON.parse(localStorage.getItem(key)||'[]');
+  list.push(Object.assign({},data,{waktu:new Date().toISOString()}));
+  localStorage.setItem(key, JSON.stringify(list));
+}
+
+function showReview(){
+  const wrap=document.getElementById('reviewWrap'); wrap.innerHTML='';
+  const letters=['A','B','C','D'];
+  QUESTIONS.forEach((q,i)=>{
+    const userIdx=answers[i], correctIdx=q.c, isCorrect=userIdx===correctIdx;
+    const div=document.createElement('div');
+    div.className='reviewItem';
+    div.innerHTML=
+      '<div class="reviewHead"><span class="reviewNum">'+(i+1)+'</span>'+
+      '<span class="badge '+(isCorrect?'ok':'no')+'">'+(isCorrect?'Benar':'Salah')+'</span></div>'+
+      '<p class="reviewQ">'+q.q+'</p>'+
+      '<p class="reviewLine">Jawaban Anda: <strong>'+(userIdx!==null? letters[userIdx]+'. '+q.o[userIdx] : '-')+'</strong></p>'+
+      '<p class="reviewLine">Jawaban benar: <strong>'+letters[correctIdx]+'. '+q.o[correctIdx]+'</strong></p>'+
+      '<p class="reviewExp">'+q.e+'</p>';
+    wrap.appendChild(div);
+  });
+  showScreen('screen-review');
+}
+
+async function showHighscore(){
+  const wrap=document.getElementById('hsWrap');
+  wrap.innerHTML='<p class="loading">Memuat data...</p>';
+  showScreen('screen-highscore');
+  let top10=[];
+  if(CONFIG.SCRIPT_URL){
+    try{
+      const res=await fetch(CONFIG.SCRIPT_URL+'?mode=leaderboard');
+      const json=await res.json();
+      top10=json.data||[];
+    }catch(err){ top10=getLocalTop10(); }
+  } else {
+    top10=getLocalTop10();
+  }
+  renderHighscore(top10);
+}
+function getLocalTop10(){
+  const list=JSON.parse(localStorage.getItem('quizLeaderboardLocal')||'[]');
+  return list.sort((a,b)=> b.nilai-a.nilai || new Date(a.waktu)-new Date(b.waktu)).slice(0,10);
+}
+function renderHighscore(list){
+  const wrap=document.getElementById('hsWrap');
+  if(!list.length){ wrap.innerHTML='<p class="loading">Belum ada data.</p>'; return; }
+  let html='<table class="hsTable"><thead><tr><th>#</th><th>Nama</th><th>Kelas</th><th>Nilai</th></tr></thead><tbody>';
+  list.forEach((r,i)=>{ html+='<tr><td>'+(i+1)+'</td><td>'+r.nama+'</td><td>'+r.kelas+'</td><td>'+r.nilai+'</td></tr>'; });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+</script>
+</body>
+</html>
